@@ -32,7 +32,7 @@ class PcvlController extends Controller
         }
 
         if ($kbblId) {
-            $query->where('kbbl_id', $kbblId);
+            $query->where('temp_kbbl_id', $kbblId);
         }
         
         if($role){
