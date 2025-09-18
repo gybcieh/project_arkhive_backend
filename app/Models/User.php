@@ -47,14 +47,4 @@ class User extends Authenticatable
             'password_digest' => 'hashed',
         ];
     }
-
-    /**
-     * Get the password for the user.
-     *
-     * @return string
-     */
-    public function getAuthPassword()
-    {
-        return $this->password_digest;
-    }
 }

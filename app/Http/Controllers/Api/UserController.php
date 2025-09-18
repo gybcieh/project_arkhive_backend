@@ -37,7 +37,7 @@ class UserController extends Controller
             $user->username = $fields['username'];
         }
         if(isset($fields['password'])){
-            $user->password_digest = bcrypt($fields['password']);
+            $user->password_digest = $fields['password'];
         }
 
         $user->save();

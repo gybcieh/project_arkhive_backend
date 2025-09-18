@@ -58,6 +58,46 @@ class Pcvl extends Model
     {
         return $this->belongsTo(Purok::class);
     }
+
+    // Self-referencing relationships
+    public function kbbl()
+    {
+        return $this->belongsTo(Pcvl::class, 'kbbl_id')
+                    ->select(['id', 'town_id', 'barangay_id', 'purok_id', 'voters_name', 'is_a', 'is_b', 'is_k', 'is_kbbl', 'is_kbpl', 'is_kbpm', 'precinct_number'])
+                    ->with(['town', 'barangay', 'purok']);
+    }
+
+    public function kbpl()
+    {
+        return $this->belongsTo(Pcvl::class, 'kbpl_id')
+                    ->select(['id', 'town_id', 'barangay_id', 'purok_id', 'voters_name', 'is_a', 'is_b', 'is_k', 'is_kbbl', 'is_kbpl', 'is_kbpm', 'kbbl_id', 'precinct_number'])
+                    ->with(['town', 'barangay', 'purok', 'kbbl']);
+    }
+
+    // You might also want relationships for family_head and assistor
+    public function familyHead()
+    {
+        return $this->belongsTo(Pcvl::class, 'family_head_id')
+                    ->select(['id', 'town_id', 'barangay_id', 'purok_id', 'voters_name', 'is_a', 'is_b', 'is_k', 'is_kbbl', 'is_kbpl', 'is_kbpm', 'precinct_number']);
+    }
+
+    public function assistor()
+    {
+        return $this->belongsTo(Pcvl::class, 'assistor_id')
+                    ->select(['id', 'town_id', 'barangay_id', 'purok_id', 'voters_name', 'is_a', 'is_b', 'is_k', 'is_kbbl', 'is_kbpl', 'is_kbpm', 'precinct_number']);
+    }
+
+    public function memberKbpls(){
+        return $this->hasMany(Pcvl::class, 'kbpl_id')
+                    ->with(['town', 'barangay', 'purok'])
+                    ->select(['id', 'town_id', 'barangay_id', 'purok_id', 'kbpl_id', 'voters_name', 'is_a', 'is_b', 'is_k']);
+    }
+
+    public function memberKbbls(){
+        return $this->hasMany(Pcvl::class, 'kbbl_id')
+                    ->with(['town', 'barangay', 'purok'])
+                    ->select(['id', 'town_id', 'barangay_id', 'purok_id', 'kbbl_id', 'voters_name', 'is_a', 'is_b', 'is_k']);
+    }
 }
 
 

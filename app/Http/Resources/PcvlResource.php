@@ -41,11 +41,15 @@ class PcvlResource extends JsonResource
             'is_kbpl' => $this->is_kbpl,
             'is_kbpm' => $this->is_kbpm,
             'kbbl_id' => $this->kbbl_id,
+            'kbbl' => new PcvlResource($this->whenLoaded('kbbl')),
             'kbpl_id' => $this->kbpl_id,
+            'kbpl' => new PcvlResource($this->whenLoaded('kbpl')),
             'is_family_head' => $this->is_family_head,
             'family_head_id' => $this->family_head_id,
+            'family_head' => new PcvlResource($this->whenLoaded('familyHead')),
             'is_assistor' => $this->is_assistor,
             'assistor_id' => $this->assistor_id,
+            'assistor' => new PcvlResource($this->whenLoaded('assistor')),
             'year' => $this->year,
             'deleted' => $this->deleted,
             'temp_is_kbbl' => $this->temp_is_kbbl,
@@ -53,6 +57,8 @@ class PcvlResource extends JsonResource
             'temp_is_kbpm' => $this->temp_is_kbpm,
             'temp_kbbl_id' => $this->temp_kbbl_id,
             'temp_kbpl_id' => $this->temp_kbpl_id,
+            'kbbl_members' => PcvlResource::collection($this->whenLoaded('memberKbbls')),
+            'kbpl_members' => PcvlResource::collection($this->whenLoaded('memberKbpls')),
         ];
     }
 }
