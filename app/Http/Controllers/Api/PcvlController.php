@@ -17,6 +17,7 @@ class PcvlController extends Controller
         $barangayId = $request->query('barangay_id');
         $purokId = $request->query('purok_id');
         $kbblId = $request->query('kbbl_id');
+        $role = $request->query('role');
         $id = $request->query('id');
 
         $query = Pcvl::with(['town', 'barangay', 'purok']);
@@ -32,6 +33,10 @@ class PcvlController extends Controller
 
         if ($kbblId) {
             $query->where('kbbl_id', $kbblId);
+        }
+        
+        if($role){
+            $query->where($role, true);
         }
 
         if ($id) {
