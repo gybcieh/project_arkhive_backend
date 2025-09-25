@@ -119,8 +119,8 @@
                 <thead>
                     <tr>
                         <th width="5%">#</th>
+                        <th width="15%">ID</th>
                         <th width="40%">KBPL</th>
-                        <th width="15%">Precinct</th>
                         <th width="10%">Tag</th>
                         <th width="30%">Purok</th>
                     </tr>
@@ -130,8 +130,8 @@
                         @foreach($pageMembers as $index => $member)
                             <tr>
                                 <td>{{ $startIndex + $index + 1 }}</td>
+                                <td>{{ $member->id }}</td>
                                 <td>{{ $member->voters_name }}</td>
-                                <td>{{ $member->precinct_number ?? 'N/A' }}</td>
                                 <td>
                                     @if($member->is_a)
                                         A

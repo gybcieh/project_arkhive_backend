@@ -42,7 +42,8 @@ class Pcvl extends Model
         'temp_is_kbpl',
         'temp_is_kbpm',
         'temp_kbbl_id',
-        'temp_kbpl_id'
+        'temp_kbpl_id',
+        'new_purok_id'
     ];
     
     public function town()
@@ -57,7 +58,7 @@ class Pcvl extends Model
 
     public function purok()
     {
-        return $this->belongsTo(Purok::class);
+        return $this->belongsTo(Purok::class, 'new_purok_id');
     }
 
     // Self-referencing relationships
