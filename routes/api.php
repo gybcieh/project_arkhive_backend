@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\TownController;
 use App\Http\Controllers\Api\BarangayController;
 use App\Http\Controllers\Api\PurokController;
 use App\Http\Controllers\Api\ProfileController;
+USE App\Http\Controllers\Api\AnalyticsController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -17,13 +18,17 @@ use App\Http\Controllers\Api\ProfileController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::get('validate-token', [AuthController::class, 'validateToken'])->middleware('auth:sanctum');
 
 Route::get('pcvls/search', [PcvlController::class, 'search']);
 Route::get('pcvls/kbbl', [PcvlController::class, 'fetchKbbls']);
 Route::get('pcvls/kbbl/new', [PcvlController::class, 'fetchNewKbbls']);
+Route::get('pcvls/kbbl/print', [PcvlController::class, 'printKbblMembers']);
 Route::post('pcvls/update/tags/{pcvl}', [PcvlController::class, 'updateVoterTag']);
 Route::post('pcvls/update/roles/{pcvl}', [PcvlController::class, 'updateVoterRole']);
 Route::post('pcvls/update/head/{pcvl}', [PcvlController::class, 'updateHeadId']);
+
+Route::get('analytics/voter-statistics', [AnalyticsController::class, 'getVoterStatistics']);
 
 Route::apiResource('users', UserController::class);
 Route::apiResource('pcvls', PcvlController::class)->only(['index', 'show']);

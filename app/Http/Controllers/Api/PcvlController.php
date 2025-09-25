@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pcvl;
 use App\Http\Resources\PcvlResource;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PcvlController extends Controller
 {
@@ -32,7 +33,7 @@ class PcvlController extends Controller
         }
 
         if ($kbblId) {
-            $query->where('temp_kbbl_id', $kbblId);
+            $query->where('kbbl_id', $kbblId);
         }
         
         if($role){
@@ -219,5 +220,83 @@ class PcvlController extends Controller
 
         $pcvl->load(['town', 'barangay', 'purok', 'kbbl', 'kbpl', 'familyHead', 'assistor']);
         return new PcvlResource($pcvl);
+    }
+
+    public function printKbblMembers(Request $request, Pcvl $pcvl)
+    {
+        $townId = $request->query('town_id');
+        $barangayId = $request->query('barangay_id');
+
+        if (!$townId || !$barangayId) {
+            return response()->json(['error' => 'town_id and barangay_id are required'], 400);
+        }
+
+        // Get town and barangay names for the header
+        $town = \App\Models\Town::find($townId);
+        $barangay = \App\Models\Barangay::find($barangayId);
+
+        if (!$town || !$barangay) {
+            return response()->json(['error' => 'Invalid town_id or barangay_id'], 404);
+        }
+
+        // Get all KBBLs in the specified town and barangay
+        $kbbls = Pcvl::with(['town', 'barangay', 'purok'])
+            ->where('town_id', $townId)
+            ->where('barangay_id', $barangayId)
+            ->where('is_kbbl', true)
+            ->orderBy('voters_name', 'asc')
+            ->get();
+
+        if ($kbbls->isEmpty()) {
+            return response()->json(['error' => 'No KBBLs found for the specified town and barangay'], 404);
+        }
+
+        $kbblGroups = [];
+
+        // For each KBBL, get their members (KBPLs) - include even if no members
+        foreach ($kbbls as $kbbl) {
+            $members = Pcvl::with(['town', 'barangay', 'purok'])
+                ->where('town_id', $townId)
+                ->where('barangay_id', $barangayId)
+                ->where('is_kbpl', true)
+                ->where('kbbl_id', $kbbl->id)
+                ->orderBy('voters_name', 'asc')
+                ->get();
+
+            // Always include KBBL, even if no members
+            $kbblGroups[] = [
+                'kbbl_name' => $kbbl->voters_name,
+                'kbbl_id' => $kbbl->id,
+                'purok' => $kbbl->purok,
+                'members' => $members
+            ];
+        }
+
+        if (empty($kbblGroups)) {
+            return response()->json(['error' => 'No KBBL members found'], 404);
+        }
+
+        // Generate PDF
+        $pdf = Pdf::loadView('kbbl-members', [
+            'kbblGroups' => $kbblGroups,
+            'townName' => $town->name,
+            'barangayName' => $barangay->name
+        ]);
+
+        $filename = 'KBBL_Members_' . str_replace(' ', '_', $town->name) . '_' . str_replace(' ', '_', $barangay->name) . '_' . date('Y-m-d') . '.pdf';
+
+        // Check if client wants base64 response
+        if ($request->query('format') === 'base64') {
+            $pdfContent = $pdf->output();
+            return response()->json([
+                'success' => true,
+                'filename' => $filename,
+                'pdf_base64' => base64_encode($pdfContent),
+                'mime_type' => 'application/pdf'
+            ]);
+        }
+
+        // Return PDF as blob/stream with proper headers (default)
+        return $pdf->stream($filename);
     }
 }

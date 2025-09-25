@@ -110,4 +110,11 @@ class AuthController extends Controller
             ];
         }  
     }
+
+    public function validateToken(Request $request){
+        return response()->json([
+            'message' => 'Token is valid',
+            'user' => new UserResource($request->user())
+        ]);
+    }
 }

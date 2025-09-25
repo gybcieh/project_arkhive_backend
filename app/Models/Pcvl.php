@@ -44,6 +44,7 @@ class Pcvl extends Model
         'temp_kbbl_id',
         'temp_kbpl_id'
     ];
+    
     public function town()
     {
         return $this->belongsTo(Town::class);
