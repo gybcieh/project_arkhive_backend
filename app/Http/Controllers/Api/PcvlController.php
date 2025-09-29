@@ -224,13 +224,8 @@ class PcvlController extends Controller
                 $updateData['is_k'] = false;
             }else if($is_k){
                 $updateData['is_a'] = false;
-                $updateData['is_b'] = true;
-                $updateData['is_k'] = true;
-            } else {
-                // If none are true, set all to false
-                $updateData['is_a'] = false;
                 $updateData['is_b'] = false;
-                $updateData['is_k'] = false;
+                $updateData['is_k'] = true;
             }
         }
 
