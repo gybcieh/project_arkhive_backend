@@ -150,26 +150,58 @@ class PcvlController extends Controller
 
     public function updateVoterTag(Request $request, Pcvl $pcvl)
     {
-        $is_a = $request->input('is_a') || false;
-        $is_b = $request->input('is_b') || false;
-        $is_k = $request->input('is_k') || false;
+        // Prepare update data - start with empty array
+        $updateData = [];
 
-        if($is_a){
-            $pcvl->is_b = false;
-            $pcvl->is_k = false;
-        }else if($is_b){
-            $pcvl->is_a = false;
-            $pcvl->is_k = false;
-        }else if($is_k){
-            $pcvl->is_a = false;
-            $pcvl->is_b = false;
+        // Conditionally add fields only if they are provided in the request
+        if ($request->has('is_inc')) {
+            $updateData['is_inc'] = $request->input('is_inc', false);
+        }
+        
+        if ($request->has('is_jehovah')) {
+            $updateData['is_jehovah'] = $request->input('is_jehovah', false);
+        }
+        
+        if ($request->has('is_abroad')) {
+            $updateData['is_abroad'] = $request->input('is_abroad', false);
+        }
+        
+        if ($request->has('is_out_of_town')) {
+            $updateData['is_out_of_town'] = $request->input('is_out_of_town', false);
+        }
+        
+        if ($request->has('is_deceased')) {
+            $updateData['is_deceased'] = $request->input('is_deceased', false);
         }
 
-        $pcvl->update([
-            'is_a' => $is_a,
-            'is_b' => $is_b,
-            'is_k' => $is_k,
-        ]);
+        // Handle A, B, K fields - only update if one of them is provided
+        if ($request->has('is_a') || $request->has('is_b') || $request->has('is_k')) {
+            $is_a = $request->input('is_a', false);
+            $is_b = $request->input('is_b', false);
+            $is_k = $request->input('is_k', false);
+
+            // Apply mutual exclusivity logic
+            if($is_a){
+                $updateData['is_a'] = true;
+                $updateData['is_b'] = false;
+                $updateData['is_k'] = false;
+            }else if($is_b){
+                $updateData['is_a'] = false;
+                $updateData['is_b'] = true;
+                $updateData['is_k'] = false;
+            }else if($is_k){
+                $updateData['is_a'] = false;
+                $updateData['is_b'] = true;
+                $updateData['is_k'] = true;
+            } else {
+                // If none are true, set all to false
+                $updateData['is_a'] = false;
+                $updateData['is_b'] = false;
+                $updateData['is_k'] = false;
+            }
+        }
+
+        $pcvl->update($updateData);
 
         $pcvl->load(['town', 'barangay', 'purok', 'kbbl', 'kbpl', 'familyHead', 'assistor']);
         return new PcvlResource($pcvl);
