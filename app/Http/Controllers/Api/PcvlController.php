@@ -18,6 +18,7 @@ class PcvlController extends Controller
         $barangayId = $request->query('barangay_id');
         $purokId = $request->query('purok_id');
         $kbblId = $request->query('kbbl_id');
+        $kbplId = $request->query('kbpl_id');
         $role = $request->query('role');
         $id = $request->query('id');
 
@@ -34,6 +35,10 @@ class PcvlController extends Controller
 
         if ($kbblId) {
             $query->where('kbbl_id', $kbblId);
+        }
+
+        if ($kbplId) {
+            $query->where('temp_kbpl_id', $kbplId);
         }
         
         if($role){
@@ -120,6 +125,34 @@ class PcvlController extends Controller
             'data' => PcvlResource::collection($pcvls)
         ]);
     }
+
+    public function fetchKbpls(Request $request)
+    {
+        $town_id = $request->query('town_id');
+        $barangay_id = $request->query('barangay_id');
+        $purok_id = $request->query('purok_id');
+
+        $query = Pcvl::with(['town', 'barangay', 'purok', 'kbbl', 'kbpl', 'familyHead', 'assistor']);
+        if ($town_id) {
+            $query->where('town_id', $town_id);
+        }
+        if ($barangay_id) {
+            $query->where('barangay_id', $barangay_id);
+        }
+        if ($purok_id) {
+            $query->where('purok_id', $purok_id);
+        }
+        $query->where('temp_is_kbpl', true);
+        $pcvls = $query->get()->sortBy('voters_name')->values();
+        $rows = $pcvls->count();
+
+        // return PcvlResource::collection($pcvls);
+        return response()->json([
+            'rows' => $rows,
+            'data' => PcvlResource::collection($pcvls)
+        ]);
+    }
+
 
     public function fetchNewKbbls(Request $request)
     {
