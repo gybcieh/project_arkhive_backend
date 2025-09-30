@@ -181,6 +181,33 @@ class PcvlController extends Controller
         ]);
     }
 
+    public function fetchNewKbpls(Request $request)
+    {
+        $town_id = $request->query('town_id');
+        $barangay_id = $request->query('barangay_id');
+        $purok_id = $request->query('purok_id');
+
+        $query = Pcvl::with(['town', 'barangay', 'purok', 'kbbl', 'kbpl', 'familyHead', 'assistor']);
+        if ($town_id) {
+            $query->where('town_id', $town_id);
+        }
+        if ($barangay_id) {
+            $query->where('barangay_id', $barangay_id);
+        }
+        if ($purok_id) {
+            $query->where('new_purok_id', $purok_id);
+        }
+        $query->where('is_kbpl', true);
+        $pcvls = $query->get()->sortBy('voters_name')->values();
+        $rows = $pcvls->count();
+
+        // return PcvlResource::collection($pcvls);
+        return response()->json([
+            'rows' => $rows,
+            'data' => PcvlResource::collection($pcvls)
+        ]);
+    }
+
     public function updateVoterTag(Request $request, Pcvl $pcvl)
     {
         // Prepare update data - start with empty array

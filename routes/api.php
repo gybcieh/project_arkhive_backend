@@ -23,8 +23,9 @@ Route::get('validate-token', [AuthController::class, 'validateToken'])->middlewa
 Route::get('pcvls/search', [PcvlController::class, 'search']);
 Route::get('pcvls/kbbl', [PcvlController::class, 'fetchKbbls']);
 Route::get('pcvls/kbbl/new', [PcvlController::class, 'fetchNewKbbls']);
-Route::get('pcvls/kbpl', [PcvlController::class, 'fetchKbpls']);
 Route::get('pcvls/kbbl/print', [PcvlController::class, 'printKbblMembers']);
+Route::get('pcvls/kbpl', [PcvlController::class, 'fetchKbpls']);
+Route::get('pcvls/kbpl/new', [PcvlController::class, 'fetchNewKbpls']);
 Route::post('pcvls/update/tags/{pcvl}', [PcvlController::class, 'updateVoterTag']);
 Route::post('pcvls/update/roles/{pcvl}', [PcvlController::class, 'updateVoterRole']);
 Route::post('pcvls/update/head/{pcvl}', [PcvlController::class, 'updateHeadId']);
